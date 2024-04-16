@@ -1,39 +1,35 @@
 import math
-import numpy as np
-import matplotlib.pyplot as plt
-from .quincuncial import *
-import geopandas as gpd
-from shapely.geometry import Point
 import random
-import math
+import numpy as np
+import geopandas as gpd
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from shapely.geometry import Point
 
-
+from .quincuncial import *
 
 def generar_meridianos(num_meridianos, num_puntos_por_meridiano):
     coordenadas = []
     angulo_meridiano = 2 * math.pi / num_meridianos
-    for meridiano in range(num_meridianos+1):
+    for meridiano in range(num_meridianos):
         theta = angulo_meridiano*meridiano
-        for punto in range(num_puntos_por_meridiano+1):
+        for punto in range(num_puntos_por_meridiano):
             # Calcular la latitud en radianes
             p = punto*np.pi/num_puntos_por_meridiano
             # Agregar las coordenadas a la lista
             
-            if punto == num_puntos_por_meridiano + 1:
+            if punto == num_puntos_por_meridiano:
                 theta = theta - 0.00001
             
             coordenadas.append((theta, p))
-            
-            
     return coordenadas
 
 def generar_paralelos(num_paralelos, num_puntos_por_paralelo):
     coordenadas = []
     angulo_paralelos = math.pi / num_paralelos
-    for paralelo in range(num_paralelos+1):   # Ajuste para incluir el ecuador
+    for paralelo in range(num_paralelos):   # Ajuste para incluir el ecuador
         p = paralelo*angulo_paralelos
-        for punto in range(num_puntos_por_paralelo+1):
+        for punto in range(num_puntos_por_paralelo):
             # Calcular la longitud en radianes
             theta = punto*2*np.pi/num_puntos_por_paralelo
             # Agregar las coordenadas a la lista
@@ -49,7 +45,6 @@ def generar_puntos_en_continentes(mapamundi, num_puntos):
         continente = random.choice(continentes)
         punto_en_continente = generar_punto_en_continente(continente)
         coordenadas_puntos.append(punto_en_continente)
-
     return coordenadas_puntos
 
 def generar_punto_en_continente(continente):
@@ -62,9 +57,7 @@ def generar_punto_en_continente(continente):
         punto_x = random.uniform(xmin, xmax)
         punto_y = random.uniform(ymin, ymax)
         punto = Point(punto_x, punto_y)
-
     return math.radians(punto.x), math.radians(punto.y)
-
 
 def plot_esfera(meridianos, paralelos):
     # Graficar los puntos en una esfera

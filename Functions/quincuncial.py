@@ -1,14 +1,5 @@
 from mpmath import *
-from mpl_toolkits.mplot3d import Axes3D
-import geopandas as gpd
-import math
 import numpy as np
-import matplotlib.pyplot as plt
-import geopandas as gpd
-from shapely.geometry import Point
-import random
-import math
-import matplotlib.pyplot as plt
 
 
 def quincuncial(punto):
