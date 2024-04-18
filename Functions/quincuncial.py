@@ -30,7 +30,7 @@ def quincuncial(punto):
         return (-float(x),float(y))
     if octante == 6:
         #pass
-        return (-float(x),2*K-float(y))
+        return (-float(x),2*K-float(y)) 
     if octante == 7:
         #pass
         return (float(x),float(y))
