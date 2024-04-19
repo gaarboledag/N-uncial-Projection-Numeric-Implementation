@@ -8,6 +8,8 @@ from mpl_toolkits.mplot3d import Axes3D
 from shapely.geometry import Point
 
 from .quincuncial import *  # Importación de una librería personalizada llamada 'quincuncial'
+from .n_uncial import *  # Importación de una librería personalizada llamada 'nuncial'
+
 
 def generar_meridianos(num_meridianos, num_puntos_por_meridiano):
     # Genera coordenadas de puntos a lo largo de los meridianos en una esfera
@@ -36,7 +38,7 @@ def generar_paralelos(num_paralelos, num_puntos_por_paralelo):
             # Agregar las coordenadas a la lista
             coordenadas.append((theta, p))
     return coordenadas
-
+    
 def generar_puntos_en_continentes(mapamundi, num_puntos):
     # Genera puntos aleatorios dentro de los continentes de un mapa
     gdf = gpd.read_file(mapamundi)
@@ -60,7 +62,7 @@ def generar_punto_en_continente(continente):
         punto = Point(punto_x, punto_y)
     return math.radians(punto.x), math.radians(punto.y)
 
-def plot_esfera(puntos):
+def plot_esfera(puntos, titulo):
     # Lista para almacenar las coordenadas x, y, z
     x_data = []
     y_data = []
@@ -76,7 +78,7 @@ def plot_esfera(puntos):
         x_data.append(x)
         y_data.append(y)
         z_data.append(z)
-
+ 
     # Crear un gráfico de dispersión 3D en Plotly
     scatter_plot = go.Scatter3d(x=x_data, y=y_data, z=z_data, mode='markers', marker=dict(color='blue', size=1))
 
@@ -84,30 +86,15 @@ def plot_esfera(puntos):
     layout = go.Layout(scene=dict(xaxis=dict(title='X'),
                                    yaxis=dict(title='Y'),
                                    zaxis=dict(title='Z')),
-                       title='Puntos sobre la esfera')
+                       title=titulo,
+                       height=1000, width=1000)
 
     # Crear figura
     fig = go.Figure(data=[scatter_plot], layout=layout)
-
     # Mostrar el gráfico interactivo
     fig.show()
 
-
-
-
-def plot_generated_mapamundi(mapamundi, coordenadas_puntos):
-    # Grafica puntos sobre un mapa del mundo (estereográfico)
-    gdf = gpd.read_file(mapamundi)
-    fig, ax = plt.subplots(figsize=(12, 8))
-    longitudes, latitudes = zip(*coordenadas_puntos)
-    ax.scatter(longitudes, latitudes, color='red', marker='o', s=50)  # Puntos rojos para los puntos generados
-    ax.set_title('Distribución de Puntos en Continentes')
-    ax.set_xlabel('Longitud (radianes)')
-    ax.set_ylabel('Latitud (radianes)')
-    plt.gca().set_aspect('equal', adjustable='box')  # Escala 1x1
-    plt.show()
-
-def plot_coordenadas(meridianos, paralelos, funcion):
+def plot_myp(meridianos, paralelos, funcion):
     # Grafica los meridianos y paralelos mapeados según la proyección pasada como función
     img_meridianos = [funcion(punto) for punto in meridianos]
     img_paralelos = [funcion(punto) for punto in paralelos]
@@ -123,16 +110,20 @@ def plot_coordenadas(meridianos, paralelos, funcion):
     plt.tight_layout()
     plt.show()
 
-def plot_proyeccion(coordenadas_puntos, funcion):
+def plot_proyeccion(coordenadas_puntos, funcion, titulo):
     # Grafica el mapeo del mapamundi según la proyección pasada como función
     map = []
     for punto in coordenadas_puntos:
-        map.append(funcion((punto[0] + np.pi, punto[1] + np.pi/2)))
+        map.append(funcion((punto[0], punto[1])))
     filtered_map = [coord for coord in map if coord is not None]
     x, y = zip(*filtered_map)
+    plt.figure(figsize=(15, 12))
     plt.plot(x, y, color='blue', marker='o', markersize=0.1, linestyle='none')  # Puntos azules para la proyección
     plt.xlabel('Eje X')
     plt.ylabel('Eje Y')
-    plt.title('Peirce Quincuncial Projection')
+    plt.title(titulo)
     plt.gca().set_aspect('equal', adjustable='box')
+    plt.axis('off')
+    plt.tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
+
     plt.show()
