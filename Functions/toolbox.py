@@ -62,37 +62,7 @@ def generar_punto_en_continente(continente):
         punto = Point(punto_x, punto_y)
     return math.radians(punto.x), math.radians(punto.y)
 
-def plot_esfera(puntos, titulo):
-    # Lista para almacenar las coordenadas x, y, z
-    x_data = []
-    y_data = []
-    z_data = []
 
-    # Iterar sobre los puntos y calcular las coordenadas x, y, z
-    for coordenada in puntos:
-        theta = coordenada[0]
-        p = coordenada[1]
-        x = math.sin(p) * math.cos(theta)
-        y = math.sin(p) * math.sin(theta)
-        z = math.cos(p)
-        x_data.append(x)
-        y_data.append(y)
-        z_data.append(z)
- 
-    # Crear un gráfico de dispersión 3D en Plotly
-    scatter_plot = go.Scatter3d(x=x_data, y=y_data, z=z_data, mode='markers', marker=dict(color='blue', size=1))
-
-    # Configurar el diseño del gráfico
-    layout = go.Layout(scene=dict(xaxis=dict(title='X'),
-                                   yaxis=dict(title='Y'),
-                                   zaxis=dict(title='Z')),
-                       title=titulo,
-                       height=1000, width=1000)
-
-    # Crear figura
-    fig = go.Figure(data=[scatter_plot], layout=layout)
-    # Mostrar el gráfico interactivo
-    fig.show()
 
 def plot_myp(meridianos, paralelos, funcion):
     # Grafica los meridianos y paralelos mapeados según la proyección pasada como función
@@ -110,20 +80,38 @@ def plot_myp(meridianos, paralelos, funcion):
     plt.tight_layout()
     plt.show()
 
-def plot_proyeccion(coordenadas_puntos, funcion, titulo):
-    # Grafica el mapeo del mapamundi según la proyección pasada como función
-    map = []
-    for punto in coordenadas_puntos:
-        map.append(funcion((punto[0], punto[1])))
-    filtered_map = [coord for coord in map if coord is not None]
-    x, y = zip(*filtered_map)
+def distancia(p1, p2):
+    return sqrt((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2)
+
+def plot_proyeccion(lista_parejas_ordenadas, funcion, titulo):
     plt.figure(figsize=(15, 12))
-    plt.plot(x, y, color='blue', marker='o', markersize=0.1, linestyle='none')  # Puntos azules para la proyección
+    for continente in lista_parejas_ordenadas:
+        x = []
+        y = []
+        r2_proyectado = None
+        for punto in continente:
+            punto_proyectado = funcion((punto[0], punto[1]))
+            if punto_proyectado is not None:
+                if r2_proyectado is not None and distancia(punto_proyectado, r2_proyectado) > 0.5:
+                    if len(x) > 1 and len(y) > 1:
+                        plt.plot(x, y, color='blue', linestyle='-')  # Líneas azules para los continentes
+                    x = []
+                    y = []
+                x.append(punto_proyectado[0])
+                y.append(punto_proyectado[1])
+                r2_proyectado = punto_proyectado
+            else:
+                if len(x) > 1 and len(y) > 1:
+                    plt.plot(x, y, color='blue', linestyle='-')  # Líneas azules para los continentes
+                x = []
+                y = []
+                r2_proyectado = None
+        if len(x) > 1 and len(y) > 1:
+            plt.plot(x, y, color='blue', linestyle='-')  # Líneas azules para los continentes
     plt.xlabel('Eje X')
     plt.ylabel('Eje Y')
     plt.title(titulo)
     plt.gca().set_aspect('equal', adjustable='box')
     plt.axis('off')
-    plt.tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
-
     plt.show()
+
